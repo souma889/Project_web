@@ -1,0 +1,42 @@
+-- 1. Create the database with your specific name
+CREATE DATABASE IF NOT EXISTS noteapp;
+USE noteapp;
+
+-- 2. Users table: Required for registration and login [cite: 20, 21]
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+-- 3. Notes table: Contains all required functional fields [cite: 8, 9, 10, 11, 12, 41]
+CREATE TABLE notes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL, -- Obligatoire, max 100 [cite: 9]
+    content TEXT NULL,            -- Optionnel [cite: 10]
+    priority ENUM('Bas', 'Moyen', 'Haut') DEFAULT 'Moyen', -- [cite: 12]
+    user_id BIGINT UNSIGNED NOT NULL, -- Owner [cite: 41]
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Auto [cite: 11]
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Deletes notes if the user is deleted
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 4. Sanctum table: Essential for "auth:sanctum" middleware [cite: 16, 49]
+CREATE TABLE personal_access_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tokenable_type VARCHAR(255) NOT NULL,
+    tokenable_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    abilities TEXT NULL,
+    last_used_at TIMESTAMP NULL,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    INDEX (tokenable_type, tokenable_id)
+);
